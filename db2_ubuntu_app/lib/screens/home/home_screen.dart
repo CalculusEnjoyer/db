@@ -1,3 +1,4 @@
+import 'package:db2_ubuntu_app/database/database.dart';
 import 'package:db2_ubuntu_app/screens/tables/customers_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -6,6 +7,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    DatabaseConnection().connection;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Home Screen'),
