@@ -1,5 +1,11 @@
 import 'package:db2_ubuntu_app/database/database.dart';
+import 'package:db2_ubuntu_app/screens/queries/choose_screen/complex_queries_screen.dart';
+import 'package:db2_ubuntu_app/screens/queries/choose_screen/simple_queries_screen.dart';
 import 'package:db2_ubuntu_app/screens/tables/customers_screen.dart';
+import 'package:db2_ubuntu_app/screens/tables/employees.dart';
+import 'package:db2_ubuntu_app/screens/tables/items.dart';
+import 'package:db2_ubuntu_app/screens/tables/order_items.dart';
+import 'package:db2_ubuntu_app/screens/tables/orders.dart';
 import 'package:flutter/material.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -24,31 +30,33 @@ class HomeScreen extends StatelessWidget {
             ),
             ListTile(
               title: Text('Customers'),
-              onTap: () {Navigator.push(context, MaterialPageRoute(builder: (_) => CustomersScreen()));
+              onTap: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (_) => CustomersScreen()));
               },
             ),
             ListTile(
               title: Text('Employees'),
               onTap: () {
-                // Handle option 2 tap
+                Navigator.push(context, MaterialPageRoute(builder: (_) => EmployeesScreen()));
               },
             ),
             ListTile(
               title: Text('Items'),
               onTap: () {
-                // Handle option 3 tap
+                Navigator.push(context, MaterialPageRoute(builder: (_) => ItemsScreen()));
               },
             ),
             ListTile(
               title: Text('Order Items'),
               onTap: () {
-                // Handle option 4 tap
+                Navigator.push(context, MaterialPageRoute(builder: (_) => OrderItemsScreen()));
               },
             ),
             ListTile(
               title: Text('Orders'),
               onTap: () {
-                // Handle option 5 tap
+                Navigator.push(context, MaterialPageRoute(builder: (_) => OrdersScreen()));
               },
             ),
           ],
@@ -60,14 +68,14 @@ class HomeScreen extends StatelessWidget {
           children: [
             ElevatedButton(
               onPressed: () {
-                // Handle complex query button press
+                Navigator.push(context, MaterialPageRoute(builder: (_) => ComplexQueryScreen()));
               },
               child: Text('Complex Queries'),
             ),
             SizedBox(height: 16),
             ElevatedButton(
               onPressed: () {
-                // Handle simple queries button press
+                Navigator.push(context, MaterialPageRoute(builder: (_) => SimpleQueryScreen()));
               },
               child: Text('Simple Queries'),
             ),
