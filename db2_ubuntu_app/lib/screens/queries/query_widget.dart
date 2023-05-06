@@ -1,27 +1,40 @@
 import 'package:db2_ubuntu_app/database/database.dart';
 import 'package:flutter/material.dart';
 import 'package:postgres/postgres.dart';
-import 'package:sqflite/sqflite.dart';
 
 class QueryWidget extends StatefulWidget {
-  const QueryWidget({Key? key}) : super(key: key);
+  QueryWidget({
+    Key? key,
+    required this.query,
+    required this.description,
+    required this.parametrName,
+  }) : super(key: key);
 
+  String query;
+  String description;
+  String parametrName;
   @override
   _QueryWidgetState createState() => _QueryWidgetState();
 }
 
 class _QueryWidgetState extends State<QueryWidget> {
   late String _query;
+  late String _description;
+  late String _parametrName;
   PostgreSQLConnection? _db;
-  List<Map<String, dynamic>>? _results;
+  PostgreSQLResult? _results;
 
   final _textEditingController = TextEditingController();
+
+
 
   @override
   void initState() {
     super.initState();
     _getDbConnection();
-    _query = '';
+    _query = widget.query;
+    _description = widget.description;
+    _parametrName = widget.parametrName;
     _results = null;
   }
 
@@ -37,7 +50,11 @@ class _QueryWidgetState extends State<QueryWidget> {
   }
 
   Future<void> _executeQuery() async {
-    final List<Map<String, dynamic>> results = await database.rawQuery(_query);
+    final results = await _db!.query(
+      _query,
+      substitutionValues: {
+        '${_parametrName}' : _textEditingController.text
+      },);
     setState(() {
       _results = results;
     });
@@ -47,42 +64,49 @@ class _QueryWidgetState extends State<QueryWidget> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SQL Query'),
+        title: Text('SQL Query'),
       ),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          TextField(
-            controller: _textEditingController,
-            decoration: const InputDecoration(
-              hintText: 'Enter SQL query',
-              border: OutlineInputBorder(),
-            ),
-            onChanged: (value) {
-              setState(() {
-                _query = value;
-              });
-            },
+          Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Text(_description),
           ),
-          ElevatedButton(
-            onPressed: _executeQuery,
-            child: const Text('Execute Query'),
+          Center(
+            child: SizedBox(
+              width: 300,
+              child: TextField(
+                controller: _textEditingController,
+                decoration:  InputDecoration(
+                  hintText: 'Enter ${_parametrName}',
+                  border: OutlineInputBorder(),
+                ),
+                onChanged: (value) {
+                  setState(() {
+                  });
+                },
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: _executeQuery,
+              child: const Text('Execute Query'),
+            ),
           ),
           if (_results != null)
             Expanded(
               child: SingleChildScrollView(
                 child: DataTable(
-                  columns: _results!.first.keys
-                      .map((String key) => DataColumn(label: Text(key)))
+                  columns: _results!.columnDescriptions
+                      .map((desc)=> DataColumn(label: Text(desc.columnName)))
                       .toList(),
                   rows: _results!
                       .map(
-                        (Map<String, dynamic> row) => DataRow(
-                      cells: row.values
-                          .map(
-                            (value) => DataCell(Text(value.toString())),
-                      )
-                          .toList(),
+                        (row)=> DataRow(
+                      cells: row.toColumnMap().values.map((value) => DataCell(Text(value.toString()))).toList()
                     ),
                   )
                       .toList(),
