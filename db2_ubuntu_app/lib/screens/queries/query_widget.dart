@@ -73,6 +73,10 @@ class _QueryWidgetState extends State<QueryWidget> {
             padding: const EdgeInsets.all(30.0),
             child: Text(_description),
           ),
+          Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Text(_query),
+          ),
           Center(
             child: SizedBox(
               width: 300,
@@ -92,7 +96,29 @@ class _QueryWidgetState extends State<QueryWidget> {
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: ElevatedButton(
-              onPressed: _executeQuery,
+              onPressed: () async {
+                try {
+                  await _executeQuery();
+                } catch (e) {
+                  showDialog(
+                    context: context,
+                    builder: (context) {
+                      return AlertDialog(
+                        title: Text('Warning'),
+                        content: Text(e.toString().substring(e.toString().indexOf(':')+2)),
+                        actions: <Widget>[
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text('OK'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                }
+              },
               child: const Text('Execute Query'),
             ),
           ),
