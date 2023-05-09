@@ -68,10 +68,14 @@ class _OrderItemsScreenState extends State<OrderItemsScreen> {
                       DataColumn(label: Text('')),
                       DataColumn(label: Text('')),
                     ],
-                    rows: _OrderItems
-                        .map(
-                          (OrderItem) => DataRow(
-                        color: OrderItem[0] == _OrderIdToEdit && OrderItem[1] == _ItemIdToEdit? MaterialStateColor.resolveWith((states) => Colors.red): MaterialStateColor.resolveWith((states) => Colors.white),
+                    rows: _OrderItems.map(
+                      (OrderItem) => DataRow(
+                        color: OrderItem[0] == _OrderIdToEdit &&
+                                OrderItem[1] == _ItemIdToEdit
+                            ? MaterialStateColor.resolveWith(
+                                (states) => Colors.red)
+                            : MaterialStateColor.resolveWith(
+                                (states) => Colors.white),
                         cells: [
                           DataCell(Text(OrderItem[0].toString())),
                           DataCell(Text(OrderItem[1].toString())),
@@ -85,7 +89,7 @@ class _OrderItemsScreenState extends State<OrderItemsScreen> {
                                     'DELETE FROM OrderItems WHERE OrderID = @Orderid and ItemID = @Itemid',
                                     substitutionValues: {
                                       'Orderid': OrderItem[0],
-                                      'Itemid' : OrderItem[1]
+                                      'Itemid': OrderItem[1]
                                     });
                                 // Refresh the data
                                 setState(() {
@@ -102,17 +106,19 @@ class _OrderItemsScreenState extends State<OrderItemsScreen> {
                                   _isEditing = true;
                                   _OrderIdToEdit = OrderItem[0];
                                   _ItemIdToEdit = OrderItem[1];
-                                  _OrderIDController.text = OrderItem[0].toString();
-                                  _ItemIdController.text = OrderItem[1].toString();
-                                  _QuantityController.text = OrderItem[2].toString();
+                                  _OrderIDController.text =
+                                      OrderItem[0].toString();
+                                  _ItemIdController.text =
+                                      OrderItem[1].toString();
+                                  _QuantityController.text =
+                                      OrderItem[2].toString();
                                 });
                               },
                             ),
                           ),
                         ],
                       ),
-                    )
-                        .toList(),
+                    ).toList(),
                   );
                 }
                 return CircularProgressIndicator();
@@ -176,68 +182,101 @@ class _OrderItemsScreenState extends State<OrderItemsScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 50.0),
                               child: ElevatedButton(
                                   child: _isEditing
                                       ? Text('Update Order + Item')
                                       : Text('Add Order + Item'),
                                   onPressed: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      if (_isEditing) {
-                                        // Update the selected record in the OrderItems table
-                                        await db!.execute(
-                                          'UPDATE OrderItems SET orderid = @orderidtoset, ItemID = @name, Quantity = @address WHERE OrderID = @Orderid and ItemID = @Itemid',
-                                          substitutionValues: {
-                                            'Orderid': _OrderIdToEdit,
-                                            'Itemid': _ItemIdToEdit,
-                                            'orderidtoset': _OrderIDController.text,
-                                            'name': _ItemIdController.text,
-                                            'address': _QuantityController.text,
-                                          },
-                                        );
-                                        // Clear the form and exit edit mode
-                                        setState(() {
-                                          _isEditing = false;
-                                          _ItemIdController.clear();
-                                          _QuantityController.clear();
-                                          _OrderIDController.clear();
-                                          _isEditing = false;
-                                          _OrderIdToEdit = null;
-                                          _ItemIdToEdit = null;
-                                        });
-                                      } else {
-                                        // Insert the new record into the OrderItems table
-                                        await db!.execute(
-                                          'INSERT INTO OrderItems (OrderId, ItemID, Quantity) VALUES (@orderid, @name, @address)',
-                                          substitutionValues: {
-                                            'orderid' : _OrderIDController.text,
-                                            'name': _ItemIdController.text,
-                                            'address': _QuantityController.text,
-                                          },
-                                        );
-                                        // Clear the form
-                                        setState(() {
-                                          _ItemIdController.clear();
-                                          _QuantityController.clear();
-                                          _OrderIDController.clear();
-                                        });
+                                    try {
+                                      if (_formKey.currentState!.validate()) {
+                                        if (_isEditing) {
+                                          // Update the selected record in the OrderItems table
+                                          await db!.execute(
+                                            'UPDATE OrderItems SET orderid = @orderidtoset, ItemID = @name, Quantity = @address WHERE OrderID = @Orderid and ItemID = @Itemid',
+                                            substitutionValues: {
+                                              'Orderid': _OrderIdToEdit,
+                                              'Itemid': _ItemIdToEdit,
+                                              'orderidtoset':
+                                                  _OrderIDController.text,
+                                              'name': _ItemIdController.text,
+                                              'address':
+                                                  _QuantityController.text,
+                                            },
+                                          );
+                                          // Clear the form and exit edit mode
+                                          setState(() {
+                                            _isEditing = false;
+                                            _ItemIdController.clear();
+                                            _QuantityController.clear();
+                                            _OrderIDController.clear();
+                                            _isEditing = false;
+                                            _OrderIdToEdit = null;
+                                            _ItemIdToEdit = null;
+                                          });
+                                        } else {
+                                          // Insert the new record into the OrderItems table
+                                          await db!.execute(
+                                            'INSERT INTO OrderItems (OrderId, ItemID, Quantity) VALUES (@orderid, @name, @address)',
+                                            substitutionValues: {
+                                              'orderid':
+                                                  _OrderIDController.text,
+                                              'name': _ItemIdController.text,
+                                              'address':
+                                                  _QuantityController.text,
+                                            },
+                                          );
+                                          // Clear the form
+                                          setState(() {
+                                            _ItemIdController.clear();
+                                            _QuantityController.clear();
+                                            _OrderIDController.clear();
+                                          });
+                                        }
                                       }
+                                    } catch (e) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: Text('Warning'),
+                                            content: Text(e
+                                                .toString()
+                                                .substring(
+                                                    e.toString().indexOf(':') +
+                                                        2)),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text('OK'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
                                     }
                                   }),
                             ),
                             if (_isEditing)
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 50.0),
                                 child: ElevatedButton(
                                     child: const Text('Cancel'),
-                                    style: ButtonStyle(backgroundColor: MaterialStateColor.resolveWith((states) => Colors.red)),
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateColor.resolveWith(
+                                                (states) => Colors.red)),
                                     onPressed: () => setState(() {
-                                      _isEditing = false;
-                                      _OrderIdToEdit = null;
-                                      _ItemIdToEdit = null;
-                                      _ItemIdController.clear();
-                                      _QuantityController.clear();
-                                    })),
+                                          _isEditing = false;
+                                          _OrderIdToEdit = null;
+                                          _ItemIdToEdit = null;
+                                          _ItemIdController.clear();
+                                          _QuantityController.clear();
+                                        })),
                               ),
                           ],
                         ),

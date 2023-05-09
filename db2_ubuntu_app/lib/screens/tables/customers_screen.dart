@@ -176,44 +176,66 @@ class _CustomersScreenState extends State<CustomersScreen> {
                                       ? Text('Update Customer')
                                       : Text('Add Customer'),
                                   onPressed: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      if (_isEditing) {
-                                        // Update the selected record in the Customers table
-                                        await db!.execute(
-                                          'UPDATE Customers SET Name = @name, Address = @address, Phone = @phone WHERE CustomerID = @id',
-                                          substitutionValues: {
-                                            'id': _idToEdit,
-                                            'name': _nameController.text,
-                                            'address': _addressController.text,
-                                            'phone': _phoneController.text,
-                                          },
-                                        );
-                                        // Clear the form and exit edit mode
-                                        setState(() {
-                                          _isEditing = false;
-                                          _nameController.clear();
-                                          _addressController.clear();
-                                          _phoneController.clear();
-                                          _isEditing = false;
-                                          _idToEdit = null;
-                                        });
-                                      } else {
-                                        // Insert the new record into the Customers table
-                                        await db!.execute(
-                                          'INSERT INTO Customers (Name, Address, Phone) VALUES (@name, @address, @phone)',
-                                          substitutionValues: {
-                                            'name': _nameController.text,
-                                            'address': _addressController.text,
-                                            'phone': _phoneController.text,
-                                          },
-                                        );
-                                        // Clear the form
-                                        setState(() {
-                                          _nameController.clear();
-                                          _addressController.clear();
-                                          _phoneController.clear();
-                                        });
+                                    try {
+                                      if (_formKey.currentState!.validate()) {
+                                        if (_isEditing) {
+                                          // Update the selected record in the Customers table
+                                          await db!.execute(
+                                            'UPDATE Customers SET Name = @name, Address = @address, Phone = @phone WHERE CustomerID = @id',
+                                            substitutionValues: {
+                                              'id': _idToEdit,
+                                              'name': _nameController.text,
+                                              'address': _addressController
+                                                  .text,
+                                              'phone': _phoneController.text,
+                                            },
+                                          );
+                                          // Clear the form and exit edit mode
+                                          setState(() {
+                                            _isEditing = false;
+                                            _nameController.clear();
+                                            _addressController.clear();
+                                            _phoneController.clear();
+                                            _isEditing = false;
+                                            _idToEdit = null;
+                                          });
+                                        } else {
+                                          // Insert the new record into the Customers table
+                                          await db!.execute(
+                                            'INSERT INTO Customers (Name, Address, Phone) VALUES (@name, @address, @phone)',
+                                            substitutionValues: {
+                                              'name': _nameController.text,
+                                              'address': _addressController
+                                                  .text,
+                                              'phone': _phoneController.text,
+                                            },
+                                          );
+                                          // Clear the form
+                                          setState(() {
+                                            _nameController.clear();
+                                            _addressController.clear();
+                                            _phoneController.clear();
+                                          });
+                                        }
                                       }
+                                    } catch (e) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: Text('Warning'),
+                                            content: Text(e.toString().substring(e.toString().indexOf(':')+2)),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text('OK'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
                                     }
                                   }),
                             ),

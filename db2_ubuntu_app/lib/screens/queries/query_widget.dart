@@ -70,12 +70,18 @@ class _QueryWidgetState extends State<QueryWidget> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Padding(
-            padding: const EdgeInsets.all(30.0),
+            padding: const EdgeInsets.all(20.0),
             child: Text(_description),
           ),
+
           Padding(
-            padding: const EdgeInsets.all(30.0),
-            child: Text(_query),
+            padding: const EdgeInsets.all(0.0),
+            child: SizedBox(
+              height: (_results ?? []).length == 0 ? 270 : 120,
+              child: SingleChildScrollView(
+                child: Text(_query),
+              ),
+            ),
           ),
           Center(
             child: SizedBox(

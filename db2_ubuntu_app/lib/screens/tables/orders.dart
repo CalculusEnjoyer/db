@@ -64,10 +64,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       DataColumn(label: Text('')),
                       DataColumn(label: Text('')),
                     ],
-                    rows: _Orders
-                        .map(
-                          (Order) => DataRow(
-                        color: Order[0] == _idToEdit? MaterialStateColor.resolveWith((states) => Colors.red): MaterialStateColor.resolveWith((states) => Colors.white),
+                    rows: _Orders.map(
+                      (Order) => DataRow(
+                        color: Order[0] == _idToEdit
+                            ? MaterialStateColor.resolveWith(
+                                (states) => Colors.red)
+                            : MaterialStateColor.resolveWith(
+                                (states) => Colors.white),
                         cells: [
                           DataCell(Text(Order[0].toString())),
                           DataCell(Text(Order[1].toString())),
@@ -79,9 +82,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                 // Delete the selected record from the Orders table
                                 await db!.execute(
                                     'DELETE FROM Orders WHERE OrderID = @id',
-                                    substitutionValues: {
-                                      'id': Order[0]
-                                    });
+                                    substitutionValues: {'id': Order[0]});
                                 // Refresh the data
                                 setState(() {
                                   _Orders.remove(Order);
@@ -104,8 +105,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                           ),
                         ],
                       ),
-                    )
-                        .toList(),
+                    ).toList(),
                   );
                 }
                 return CircularProgressIndicator();
@@ -155,61 +155,92 @@ class _OrdersScreenState extends State<OrdersScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 50.0),
                               child: ElevatedButton(
                                   child: _isEditing
                                       ? Text('Update Order')
                                       : Text('Add Order'),
                                   onPressed: () async {
-                                    if (_formKey.currentState!.validate()) {
-                                      if (_isEditing) {
-                                        // Update the selected record in the Orders table
-                                        await db!.execute(
-                                          'UPDATE Orders SET ItemID = @name, Quantity = @address WHERE OrderID = @id',
-                                          substitutionValues: {
-                                            'id': _idToEdit,
-                                            'name': _nameController.text,
-                                            'address': _addressController.text,
-                                          },
-                                        );
-                                        // Clear the form and exit edit mode
-                                        setState(() {
-                                          _isEditing = false;
-                                          _nameController.clear();
-                                          _addressController.clear();
-                                          _isEditing = false;
-                                          _idToEdit = null;
-                                        });
-                                      } else {
-                                        // Insert the new record into the Orders table
-                                        await db!.execute(
-                                          'INSERT INTO Orders (CustomerID, EmployeeID) VALUES (@name, @address)',
-                                          substitutionValues: {
-                                            'name': _nameController.text,
-                                            'address': _addressController.text,
-                                          },
-                                        );
-                                        // Clear the form
-                                        setState(() {
-                                          _nameController.clear();
-                                          _addressController.clear();
-                                        });
+                                    try {
+                                      if (_formKey.currentState!.validate()) {
+                                        if (_isEditing) {
+                                          // Update the selected record in the Orders table
+                                          await db!.execute(
+                                            'UPDATE Orders SET CustomerId = @name, EmployeeId = @address WHERE OrderID = @id',
+                                            substitutionValues: {
+                                              'id': _idToEdit,
+                                              'name': _nameController.text,
+                                              'address':
+                                                  _addressController.text,
+                                            },
+                                          );
+                                          // Clear the form and exit edit mode
+                                          setState(() {
+                                            _isEditing = false;
+                                            _nameController.clear();
+                                            _addressController.clear();
+                                            _isEditing = false;
+                                            _idToEdit = null;
+                                          });
+                                        } else {
+                                          // Insert the new record into the Orders table
+                                          await db!.execute(
+                                            'INSERT INTO Orders (CustomerID, EmployeeID) VALUES (@name, @address)',
+                                            substitutionValues: {
+                                              'name': _nameController.text,
+                                              'address':
+                                                  _addressController.text,
+                                            },
+                                          );
+                                          // Clear the form
+                                          setState(() {
+                                            _nameController.clear();
+                                            _addressController.clear();
+                                          });
+                                        }
                                       }
+                                    } catch (e) {
+                                      showDialog(
+                                        context: context,
+                                        builder: (context) {
+                                          return AlertDialog(
+                                            title: Text('Warning'),
+                                            content: Text(e
+                                                .toString()
+                                                .substring(
+                                                    e.toString().indexOf(':') +
+                                                        2)),
+                                            actions: <Widget>[
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: Text('OK'),
+                                              ),
+                                            ],
+                                          );
+                                        },
+                                      );
                                     }
                                   }),
                             ),
                             if (_isEditing)
                               Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 50.0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 50.0),
                                 child: ElevatedButton(
                                     child: const Text('Cancel'),
-                                    style: ButtonStyle(backgroundColor: MaterialStateColor.resolveWith((states) => Colors.red)),
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            MaterialStateColor.resolveWith(
+                                                (states) => Colors.red)),
                                     onPressed: () => setState(() {
-                                      _isEditing = false;
-                                      _idToEdit = null;
-                                      _nameController.clear();
-                                      _addressController.clear();
-                                    })),
+                                          _isEditing = false;
+                                          _idToEdit = null;
+                                          _nameController.clear();
+                                          _addressController.clear();
+                                        })),
                               ),
                           ],
                         ),
