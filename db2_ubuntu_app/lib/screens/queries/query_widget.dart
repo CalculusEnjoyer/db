@@ -50,6 +50,7 @@ class _QueryWidgetState extends State<QueryWidget> {
   }
 
   Future<void> _executeQuery() async {
+    print(_query);
     final results = await _db!.query(
       _query,
       substitutionValues: {
@@ -62,6 +63,8 @@ class _QueryWidgetState extends State<QueryWidget> {
 
   @override
   Widget build(BuildContext context) {
+    print(_description);
+    print(_query);
     return Scaffold(
       appBar: AppBar(
         title: Text('SQL Query'),
@@ -77,7 +80,7 @@ class _QueryWidgetState extends State<QueryWidget> {
           Padding(
             padding: const EdgeInsets.all(0.0),
             child: SizedBox(
-              height: (_results ?? []).length == 0 ? 270 : 120,
+              height: (_results ?? []).length == 0 ? 350 : 120,
               child: SingleChildScrollView(
                 child: Text(_query),
               ),

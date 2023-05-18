@@ -16,7 +16,7 @@ class HomeScreen extends StatelessWidget {
     DatabaseConnection().connection;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Home Screen'),
+        title: const Text('Salamanca family Cafe'),
       ),
       drawer: Drawer(
         child: ListView(
